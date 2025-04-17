@@ -19,11 +19,11 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  large_file_handler: ^0.3.1
-  path: ^1.9.0
-  path_provider: ^2.1.4
-  plugin_platform_interface: ^2.0.2
-  shared_preferences: ^2.5.2
+  large_file_handler: any
+  path: any
+  path_provider: any
+  plugin_platform_interface: any
+  shared_preferences: any
 
 dev_dependencies:
   flutter_test:
