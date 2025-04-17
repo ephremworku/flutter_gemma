@@ -95,7 +95,7 @@ class _ModelDownloadScreenState extends State<ModelDownloadScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          spacing: 16,
+          // spacing: 16,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
