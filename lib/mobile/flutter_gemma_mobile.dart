@@ -94,6 +94,8 @@ class FlutterGemma extends FlutterGemmaPlugin {
     }
   }
 
+
+
   Future<void> _closeModelBeforeDeletion() {
     return _initializedModel?.close() ?? Future.value();
   }

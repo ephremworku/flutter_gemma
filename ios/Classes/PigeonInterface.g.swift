@@ -125,6 +125,7 @@ protocol PlatformService {
   func addQueryChunk(prompt: String, completion: @escaping (Result<Void, Error>) -> Void)
   func generateResponse(completion: @escaping (Result<String, Error>) -> Void)
   func generateResponseAsync(completion: @escaping (Result<Void, Error>) -> Void)
+  func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -267,6 +268,23 @@ class PlatformServiceSetup {
       }
     } else {
       generateResponseAsyncChannel.setMessageHandler(nil)
+    }
+    let getEmbeddingOfTextChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_gemma.PlatformService.getEmbeddingOfText\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getEmbeddingOfTextChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let textArg = args[0] as! String
+        api.getEmbeddingOfText(text: textArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      getEmbeddingOfTextChannel.setMessageHandler(nil)
     }
   }
 }

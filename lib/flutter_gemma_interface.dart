@@ -91,6 +91,8 @@ abstract class InferenceModel {
     return chat!;
   }
 
+  Future<List<double>> getEmbeddingText(String text);
+
   Future<void> close();
 }
 

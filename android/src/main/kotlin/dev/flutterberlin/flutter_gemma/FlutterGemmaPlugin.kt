@@ -132,6 +132,17 @@ private class PlatformServiceImpl(
     }
   }
 
+  override fun getEmbeddingOfText(text: String, callback: (Result<List<Double>>)){
+    scope.launch {
+      try {
+        val embedding = inferenceModel.getEmbeddingOfText(text): throw IllegalStateException("Session not created")
+        callback(Result.success(embedding))
+      } catch (e: Exception) {
+        callback(Result.failure(e))
+      }
+    }
+  }
+
   override fun generateResponse(callback: (Result<String>) -> Unit) {
     scope.launch {
       try {

@@ -94,6 +94,7 @@ interface PlatformService {
   fun addQueryChunk(prompt: String, callback: (Result<Unit>) -> Unit)
   fun generateResponse(callback: (Result<String>) -> Unit)
   fun generateResponseAsync(callback: (Result<Unit>) -> Unit)
+  fun getEmbeddingOfText(text: String, callback: (Result<List<Double>>) -> Unit)
 
   companion object {
     /** The codec used by PlatformService. */
@@ -250,6 +251,26 @@ interface PlatformService {
                 reply.reply(wrapError(error))
               } else {
                 reply.reply(wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_gemma.PlatformService.getEmbeddingOfText$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val textArg = args[0] as String
+            api.getEmbeddingOfText(textArg) { result: Result<List<Double>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
               }
             }
           }

@@ -96,6 +96,7 @@ class InferenceModelSession(
     private val errorFlow: MutableSharedFlow<Throwable>
 ) {
     private val session: LlmInferenceSession
+    private val embeddingInference: EmbeddingInference
 
     init {
         val sessionOptionsBuilder = LlmInferenceSession.LlmInferenceSessionOptions.builder()
@@ -117,6 +118,8 @@ class InferenceModelSession(
 
     fun generateResponse(): String = session.generateResponse()
 
+    fun getEmbeddingOfText(text: String) = embeddingInference.generateEmbedding(text)
+
     fun generateResponseAsync() {
         session.generateResponseAsync { result, done ->
             result?.let {
@@ -127,5 +130,67 @@ class InferenceModelSession(
 
     fun close() {
         session.close()
+    }
+}
+
+class EmbeddingInference (private val context: Context) {
+
+    private var textEmbedder: TextEmbedder? = null
+
+    init {
+        setupTextEmbedder()
+    }
+
+    private fun setupTextEmbedder(): Boolean {
+        return try {
+            val baseOptions = BaseOptions.builder()
+                .setDelegate(Delegate.CPU)
+                .setModelAssetPath(MODEL_PATH)
+                .build()
+
+            val options = TextEmbedderOptions.builder()
+                .setBaseOptions(baseOptions)
+                .build()
+
+            textEmbedder = TextEmbedder.createFromOptions(context, options)
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize TextEmbedder: ${e.message}")
+            false
+        }
+    }
+
+    fun generateEmbedding(text: String): List<Double>? {
+        if (textEmbedder == null && !setupTextEmbedder()) {
+            return null
+        }
+
+        val startTime = SystemClock.uptimeMillis()
+        return try {
+            val embedding = textEmbedder
+                ?.embed(text)
+                ?.embeddingResult()
+                ?.embeddings()
+                ?.firstOrNull()
+                ?.floatEmbedding()
+
+            val inferenceTime = SystemClock.uptimeMillis() - startTime
+            Log.d(TAG, "Text embedding computed in $inferenceTime ms")
+
+            embedding?.map { it.toDouble() }
+        } catch (e: Exception) {
+            Log.e(TAG, "Embedding failed: ${e.message}")
+            null
+        }
+    }
+
+    fun close() {
+        textEmbedder?.close()
+        textEmbedder = null
+    }
+
+    companion object {
+        private const val TAG = "TextEmbedderHelper"
+        private const val MODEL_PATH = "universal_sentence_encoder.tflite"
     }
 }

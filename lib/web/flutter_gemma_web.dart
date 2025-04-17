@@ -118,6 +118,12 @@ class WebInferenceModel extends InferenceModel {
     session = null;
     onClose();
   }
+
+  @override
+  Future<List<double>> getEmbeddingText(String text) {
+    // TODO: implement getEmbeddingText
+    throw UnimplementedError();
+  }
 }
 
 class WebModelSession extends InferenceModelSession {

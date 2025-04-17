@@ -55,4 +55,7 @@ abstract class PlatformService {
 
   @async
   void generateResponseAsync();
+
+  @async
+  List<double> getEmbeddingOfText(String text);
 }
