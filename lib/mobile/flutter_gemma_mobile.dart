@@ -94,6 +94,12 @@ class FlutterGemma extends FlutterGemmaPlugin {
     }
   }
 
+  @override
+  Future<List<double>> getEmbeddingText(String text) {
+    // TODO: implement getEmbeddingText
+    final embedding = _platformService.getEmbeddingOfText(text);
+    return embedding;
+  }
 
 
   Future<void> _closeModelBeforeDeletion() {

@@ -42,6 +42,12 @@ class FlutterGemmaWeb extends FlutterGemmaPlugin {
     );
     return Future.value(model);
   }
+
+  @override
+  Future<List<double>> getEmbeddingText(String text) {
+    // TODO: implement getEmbeddingText
+    throw UnimplementedError();
+  }
 }
 
 class WebInferenceModel extends InferenceModel {
@@ -119,11 +125,7 @@ class WebInferenceModel extends InferenceModel {
     onClose();
   }
 
-  @override
-  Future<List<double>> getEmbeddingText(String text) {
-    // TODO: implement getEmbeddingText
-    throw UnimplementedError();
-  }
+
 }
 
 class WebModelSession extends InferenceModelSession {

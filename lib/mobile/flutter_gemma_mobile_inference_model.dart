@@ -77,12 +77,7 @@ class MobileInferenceModel extends InferenceModel {
     await _platformService.closeModel();
   }
 
-  @override
-  Future<List<double>> getEmbeddingText(String text) {
-    // TODO: implement getEmbeddingText
-    final embedding = _platformService.getEmbeddingOfText(text);
-    return embedding;
-  }
+
 }
 
 class MobileInferenceModelSession extends InferenceModelSession {

@@ -41,6 +41,8 @@ abstract class FlutterGemmaPlugin extends PlatformInterface {
     PreferredBackend? preferredBackend,
     List<int>? loraRanks,
   });
+  Future<List<double>> getEmbeddingText(String text);
+
 }
 
 /// Represents an LLM model instance.
@@ -91,7 +93,6 @@ abstract class InferenceModel {
     return chat!;
   }
 
-  Future<List<double>> getEmbeddingText(String text);
 
   Future<void> close();
 }

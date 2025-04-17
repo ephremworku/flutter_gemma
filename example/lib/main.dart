@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gemma_example/model_selection_screen.dart';
+
+import 'main_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,7 @@ class ChatApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark,
-      home: const SafeArea(child: ModelSelectionScreen()),
+      home: const SafeArea(child: MainPageFor()),
     );
   }
 }

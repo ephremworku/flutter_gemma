@@ -18,6 +18,8 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> {
   final _gemma = FlutterGemmaPlugin.instance;
+
+  // _gemma.g
   InferenceChat? chat;
   final _messages = <Message>[];
   bool _isModelInitialized = false;

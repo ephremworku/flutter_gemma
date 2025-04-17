@@ -23,6 +23,8 @@ class FlutterGemmaPlugin: FlutterPlugin {
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     eventChannel.setStreamHandler(null)
+//    textEmbedderHelper?.close()
+//    textEmbedderHelper = null
   }
 }
 
@@ -30,6 +32,7 @@ private class PlatformServiceImpl(
   val context: Context
 ) : PlatformService, EventChannel.StreamHandler {
   private val scope = CoroutineScope(Dispatchers.IO)
+  private var textEmbedderHelper: TextEmbedderHelper? = null
   private var eventSink: EventChannel.EventSink? = null
   private var inferenceModel: InferenceModel? = null
   private var session: InferenceModelSession? = null
@@ -132,16 +135,32 @@ private class PlatformServiceImpl(
     }
   }
 
-  override fun getEmbeddingOfText(text: String, callback: (Result<List<Double>>)){
+//  override fun getEmbeddingOfText(text: String, callback: (Result<List<Double>>)){
+//    scope.launch {
+//      try {
+//        val embedding = inferenceModel.getEmbeddingOfText(text): throw IllegalStateException("Session not created")
+//        callback(Result.success(embedding))
+//      } catch (e: Exception) {
+//        callback(Result.failure(e))
+//      }
+//    }
+//  }
+  override fun getEmbeddingOfText(text: String, callback: (Result<List<Double>>) -> Unit) {
     scope.launch {
       try {
-        val embedding = inferenceModel.getEmbeddingOfText(text): throw IllegalStateException("Session not created")
+        if (textEmbedderHelper == null) {
+          textEmbedderHelper = TextEmbedderHelper(context)
+        }
+        val embedding = textEmbedderHelper?.getEmbedding(text)
+          ?: throw IllegalStateException("Failed to compute embedding")
+
         callback(Result.success(embedding))
       } catch (e: Exception) {
         callback(Result.failure(e))
       }
     }
   }
+
 
   override fun generateResponse(callback: (Result<String>) -> Unit) {
     scope.launch {
