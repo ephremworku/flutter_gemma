@@ -67,4 +67,41 @@ final class InferenceSession {
         }
         return session.generateResponseAsync()
     }
+
+     private var textEmbedder: TextEmbedder?
+
+        func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], Error>) -> Void) {
+            DispatchQueue.global(qos: .userInitiated).async {
+                do {
+                    // Lazy-load the embedder if needed
+                    if self.textEmbedder == nil {
+                        let bundle = Bundle(for: Self.self)
+                        let modelPath = bundle.path(forResource: "text_embedder_model", ofType: "tflite")
+                        guard let modelPath = modelPath else {
+                            throw PigeonError(code: "MODEL_NOT_FOUND", message: "text_embedder_model.tflite not found in bundle", details: nil)
+                        }
+
+                        let options = TextEmbedderOptions()
+                        options.baseOptions.modelAssetPath = modelPath
+                        options.quantize = true
+
+                        self.textEmbedder = try TextEmbedder(options: options)
+                    }
+
+                    guard let embeddingResult = try self.textEmbedder?.embed(text: text) else {
+                        throw PigeonError(code: "EMBEDDING_FAILED", message: "Failed to embed text", details: nil)
+                    }
+
+                    let embedding = embeddingResult.embeddings.first?.values.map { Double($0) } ?? []
+
+                    DispatchQueue.main.async {
+                        completion(.success(embedding))
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                }
+            }
+        }
 }
