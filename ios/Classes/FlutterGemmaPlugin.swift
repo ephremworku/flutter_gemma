@@ -189,8 +189,16 @@ class PlatformServiceImpl : NSObject, PlatformService, FlutterStreamHandler {
 func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], any Error>) -> Void) {
     // Initialize the TextEmbedderService if not already initialized
     if textEmbedderService == nil {
-        let modelPath = Bundle(for: type(of: self)).path(forResource: "text_embedder_model", ofType: "tflite")
-        print("Model path: \(String(describing: modelPath))")
+        guard let modelPath = Bundle(for: type(of: self)).path(forResource: "text_embedder_model", ofType: "tflite") else {
+            completion(.failure(PigeonError(
+                code: "MODEL_NOT_FOUND",
+                message: "Could not locate text_embedder_model.tflite",
+                details: nil
+            )))
+            return
+        }
+
+        print("Model path: \(modelPath)")
         textEmbedderService = TextEmbedderService(modelPath: modelPath)
     }
 
@@ -198,17 +206,17 @@ func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], an
     if let embeddingResult = textEmbedderService?.embed(text: text),
        let firstEmbedding = embeddingResult.embeddings.first?.floatEmbedding {
 
-        // Convert the embeddings from Float to Double
         let embeddingsAsDoubles = firstEmbedding.map { Double(truncating: $0) }
         completion(.success(embeddingsAsDoubles))
     } else {
         completion(.failure(PigeonError(
-            code: "TEXT_EMBEDDING_FAILED \(String(describing: Bundle.main.path(forResource: "text_embedder_model", ofType: "tflite")))",
+            code: "TEXT_EMBEDDING_FAILED",
             message: "Failed to embed text",
             details: nil
         )))
     }
 }
+
 
 
 
