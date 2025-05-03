@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "text_embedder_model.tflite",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

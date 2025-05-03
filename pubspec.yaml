@@ -144,6 +144,8 @@ flutter:
       web:
         pluginClass: FlutterGemmaWeb
         fileName: web/flutter_gemma_web.dart
+  assets:
+    - ios/Assets/text_embedder_model.tflite
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

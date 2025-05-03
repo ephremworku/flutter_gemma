@@ -10,12 +10,13 @@ Pod::Spec.new do |s|
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
+  s.resources        = ['Assets/**.*']
   s.resource_bundles = {
     'flutter_gemma_resources' => ['Assets/**/*']
   }
   s.dependency       'Flutter'
-  s.dependency       'MediaPipeTasksGenAI', '= 0.10.21'
-  s.dependency       'MediaPipeTasksGenAIC', '= 0.10.21'
+#   s.dependency       'MediaPipeTasksGenAI', '= 0.10.21'
+#   s.dependency       'MediaPipeTasksGenAIC', '= 0.10.21'
   s.dependency       'MediaPipeTasksText', '= 0.10.21'
   s.platform         = :ios, '13.0'
   s.pod_target_xcconfig = {
@@ -24,4 +25,3 @@ Pod::Spec.new do |s|
   }
   s.swift_version = '5.0'
 end
-

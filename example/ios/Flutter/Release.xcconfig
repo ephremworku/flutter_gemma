@@ -1,2 +1,8 @@
+# CocoaPods integration
+# Adjust if you're using a different build config (e.g., profile/debug)
+# Use the correct relative path to the generated xcconfig
+# The path is usually valid if using Flutter standard structure
+# Use `release`, `debug`, or `profile` as needed
+
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"

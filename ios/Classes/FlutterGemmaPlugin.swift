@@ -19,6 +19,7 @@ class PlatformServiceImpl : NSObject, PlatformService, FlutterStreamHandler {
     private var eventSink: FlutterEventSink?
     private var model: InferenceModel?
     private var session: InferenceSession?
+    private var textEmbedderService: TextEmbedderService?
 
     func createModel(
         maxTokens: Int64,
@@ -185,41 +186,51 @@ class PlatformServiceImpl : NSObject, PlatformService, FlutterStreamHandler {
         return nil
     }
 
-    private var textEmbedder: TextEmbedder?
+func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], any Error>) -> Void) {
+    // Initialize the TextEmbedderService if not already initialized
+    if textEmbedderService == nil {
+        let modelPath = Bundle(for: type(of: self)).path(forResource: "text_embedder_model", ofType: "tflite")
+        print("Model path: \(String(describing: modelPath))")
+        textEmbedderService = TextEmbedderService(modelPath: modelPath)
+    }
 
-    func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], Error>) -> Void) {
-        DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                // Lazy-load the embedder if needed
-                if self.textEmbedder == nil {
-                    let bundle = Bundle(for: Self.self)
-                    let modelPath = bundle.path(forResource: "text_embedder_model", ofType: "tflite")
-                    guard let modelPath = modelPath else {
-                        throw PigeonError(code: "MODEL_NOT_FOUND", message: "text_embedder_model.tflite not found in bundle", details: nil)
-                    }
+    // Get the embedding for the provided text
+    if let embeddingResult = textEmbedderService?.embed(text: text),
+       let firstEmbedding = embeddingResult.embeddings.first?.floatEmbedding {
 
-                    let options = TextEmbedderOptions()
-                    options.baseOptions.modelAssetPath = modelPath
-                    options.quantize = true
+        // Convert the embeddings from Float to Double
+        let embeddingsAsDoubles = firstEmbedding.map { Double(truncating: $0) }
+        completion(.success(embeddingsAsDoubles))
+    } else {
+        completion(.failure(PigeonError(
+            code: "TEXT_EMBEDDING_FAILED \(String(describing: Bundle.main.path(forResource: "text_embedder_model", ofType: "tflite")))",
+            message: "Failed to embed text",
+            details: nil
+        )))
+    }
+}
 
-                    self.textEmbedder = try TextEmbedder(options: options)
-                }
 
-                guard let embeddingResult = try self.textEmbedder?.embed(text: text) else {
-                    throw PigeonError(code: "EMBEDDING_FAILED", message: "Failed to embed text", details: nil)
-                }
 
-                let embedding = embeddingResult.embeddings.first?.values.map { Double($0) } ?? []
+}
 
-                DispatchQueue.main.async {
-                    completion(.success(embedding))
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
-            }
+
+class TextEmbedderService {
+    var textEmbedder: TextEmbedder?
+
+    // Initialize with the path to the model
+    init(modelPath: String?) {
+        guard let modelPath = modelPath else { return }
+        do {
+            self.textEmbedder = try TextEmbedder(modelPath: modelPath)
+        } catch {
+            print("Failed to load TextEmbedder model: \(error)")
         }
     }
 
+    // Embed the given text and return the embeddings
+    func embed(text: String) -> EmbeddingResult? {
+        guard let textEmbedder = textEmbedder else { return nil }
+        return try? textEmbedder.embed(text: text).embeddingResult
+    }
 }

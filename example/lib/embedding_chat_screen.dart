@@ -20,11 +20,14 @@ class _ChatScreenCustomState extends State<ChatScreenCustom> {
   String _error = "";
 
   void _sendMessage() async {
+    print('hello there');
     if (_controller.text.trim().isEmpty) return;
     try{
       _stringEmbedding = "${await _embeddings.getEmbeddingText(_controller.text)}";
+      print(_stringEmbedding);
 
     }catch (e){
+      print(e);
       _error = "$e";
     }
     // print("the embedding of:\n${_controller.text} is: \n$values");
