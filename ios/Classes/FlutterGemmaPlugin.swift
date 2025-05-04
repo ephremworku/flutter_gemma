@@ -188,33 +188,34 @@ class PlatformServiceImpl : NSObject, PlatformService, FlutterStreamHandler {
 
 func getEmbeddingOfText(text: String, completion: @escaping (Result<[Double], any Error>) -> Void) {
     // Initialize the TextEmbedderService if not already initialized
-    if textEmbedderService == nil {
-        guard let modelPath = Bundle(for: type(of: self)).path(forResource: "text_embedder_model", ofType: "tflite") else {
-            completion(.failure(PigeonError(
-                code: "MODEL_NOT_FOUND",
-                message: "Could not locate text_embedder_model.tflite",
-                details: nil
-            )))
-            return
-        }
-
-        print("Model path: \(modelPath)")
-        textEmbedderService = TextEmbedderService(modelPath: modelPath)
-    }
+//    if textEmbedderService == nil {
+//        guard let modelPath = Bundle(for: type(of: self)).path(forResource: "text_embedder_model", ofType: "tflite") else {
+//            completion(.failure(PigeonError(
+//                code: "MODEL_NOT_FOUND",
+//                message: "Could not locate text_embedder_model.tflite",
+//                details: nil
+//            )))
+//            return
+//        }
+//
+//        print("Model path: \(modelPath)")
+//        textEmbedderService = TextEmbedderService(modelPath: modelPath)
+//    }
+        completion(.success([0]))
 
     // Get the embedding for the provided text
-    if let embeddingResult = textEmbedderService?.embed(text: text),
-       let firstEmbedding = embeddingResult.embeddings.first?.floatEmbedding {
-
-        let embeddingsAsDoubles = firstEmbedding.map { Double(truncating: $0) }
-        completion(.success(embeddingsAsDoubles))
-    } else {
-        completion(.failure(PigeonError(
-            code: "TEXT_EMBEDDING_FAILED",
-            message: "Failed to embed text",
-            details: nil
-        )))
-    }
+//    if let embeddingResult = textEmbedderService?.embed(text: text),
+//       let firstEmbedding = embeddingResult.embeddings.first?.floatEmbedding {
+//
+//        let embeddingsAsDoubles = firstEmbedding.map { Double(truncating: $0) }
+//        completion(.success(embeddingsAsDoubles))
+//    } else {
+//        completion(.failure(PigeonError(
+//            code: "TEXT_EMBEDDING_FAILED",
+//            message: "Failed to embed text",
+//            details: nil
+//        )))
+//    }
 }
 
 
